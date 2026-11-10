@@ -13,8 +13,10 @@ fetch "$url" "$tmp/openssl.tar.gz"
 check_sha256 "$tmp/openssl.tar.gz" "$(fetch_text "$url.sha256" | awk '{print $1}')"
 mkdir "$tmp/src" && tar -C "$tmp/src" --strip-components 1 -xzf "$tmp/openssl.tar.gz"
 rm -rf "$PREFIX"
+# Built for the machine it runs on: Apple silicon or Intel.
+target=darwin64-arm64-cc; [[ "$(uname -m)" == x86_64 ]] && target=darwin64-x86_64-cc
 (cd "$tmp/src" \
-  && ./Configure darwin64-arm64-cc no-shared no-tests no-docs no-apps --prefix="$PREFIX" --libdir=lib \
+  && ./Configure "$target" no-shared no-tests no-docs no-apps --prefix="$PREFIX" --libdir=lib \
   && make -j"$(sysctl -n hw.ncpu)" && make install_sw)
 cp "$tmp/src/LICENSE.txt" "$PREFIX/LICENSE.txt"
 touch "$PREFIX/.version-$V"

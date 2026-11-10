@@ -11,6 +11,7 @@ case "$PLATFORM" in
   windows-x64) asset="rustfs-windows-x86_64-v$V.zip" ;;
   linux-x64) asset="rustfs-linux-x86_64-gnu-v$V.zip" ;;
   linux-arm64) asset="rustfs-linux-aarch64-gnu-v$V.zip" ;;
+  *) echo "RustFS has no build for $PLATFORM" >&2; exit 1 ;;
 esac
 tmp="$(mktemp -d)"; dir="$tmp/pkg"; mkdir "$dir"
 fetch "https://github.com/rustfs/rustfs/releases/download/$V/$asset" "$tmp/$asset"

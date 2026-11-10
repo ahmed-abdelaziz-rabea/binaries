@@ -53,6 +53,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PHP: ${{ inputs.php }}
           PACKAGES: ${{ inputs.packages }}
+          # A repository variable: only these platforms (e.g. macos-x64 in a fork for Intel Macs).
+          PLATFORMS: ${{ vars.PLATFORMS }}
         run: go -C tools/flockrel run . plan -versions ../../versions.json -php "$PHP" -packages "$PACKAGES"
 
   php-macos:
@@ -68,6 +70,7 @@ jobs:
     with:
       version: ${{ matrix.version }}
       package: ${{ matrix.package }}
+      platform: ${{ matrix.platform }}
       publish: true
       optional: ${{ matrix.optional == true }}
 

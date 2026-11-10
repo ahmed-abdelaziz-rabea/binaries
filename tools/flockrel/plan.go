@@ -39,6 +39,7 @@ func runPlan(args []string) error {
 	repo := fs.String("repo", os.Getenv("GITHUB_REPOSITORY"), "owner/name of the binaries repository")
 	only := fs.String("php", "", "comma-separated PHP versions to plan instead of the newest of each minor")
 	pkgs := fs.String("packages", "", "comma-separated packages to plan (default all; also \"php\", \"php-exts\" and \"frankenphp\")")
+	plats := fs.String("platforms", os.Getenv("PLATFORMS"), "comma-separated platforms to plan (default all), e.g. macos-x64 for a fork that only adds Intel Macs")
 	fs.Parse(args)
 
 	v, err := loadVersions(*versionsPath)
@@ -63,6 +64,9 @@ func runPlan(args []string) error {
 	}
 	// needed reports whether b isn't published yet, and logs the decision.
 	needed := func(b build) bool {
+		if *plats != "" && !strings.Contains(","+*plats+",", ","+b.Platform+",") {
+			return false
+		}
 		name := assetName(b.Package, b.Version, b.Build, b.Platform, platformExt[b.Platform])
 		if newest[b.Package+"-"+b.Version+" "+b.Platform] >= b.Build {
 			fmt.Fprintf(os.Stderr, "published  %s\n", name)
@@ -125,9 +129,10 @@ func runPlan(args []string) error {
 			}
 		}
 		for _, ver := range phpVersions {
-			b := build{Package: "php", Version: strings.TrimSpace(ver), Platform: "macos-arm64", Build: v.PHP.MacOS.Build}
-			if needed(b) {
-				phpMacOS = append(phpMacOS, b)
+			for _, platform := range macOSPlatforms {
+				if b := (build{Package: "php", Version: strings.TrimSpace(ver), Platform: platform, Build: v.PHP.MacOS.Build}); needed(b) {
+					phpMacOS = append(phpMacOS, b)
+				}
 			}
 		}
 		// Linux: built from the same php.net release as macOS, on each architecture.
@@ -180,8 +185,10 @@ func runPlan(args []string) error {
 			if err != nil {
 				return err
 			}
-			if b := (build{Package: "frankenphp", Version: latest, Platform: "macos-arm64", Build: v.FrankenPHP.MacOS.Build, Optional: newMinorRC.MatchString(latest)}); needed(b) {
-				phpMacOS = append(phpMacOS, b)
+			for _, platform := range macOSPlatforms {
+				if b := (build{Package: "frankenphp", Version: latest, Platform: platform, Build: v.FrankenPHP.MacOS.Build, Optional: newMinorRC.MatchString(latest)}); needed(b) {
+					phpMacOS = append(phpMacOS, b)
+				}
 			}
 			for _, platform := range linuxPlatforms {
 				if b := (build{Package: "frankenphp", Version: latest, Platform: platform, Build: v.FrankenPHP.Linux.Build, Optional: newMinorRC.MatchString(latest)}); needed(b) {

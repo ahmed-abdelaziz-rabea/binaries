@@ -32,7 +32,7 @@ on:
       platform:
         description: Platform
         type: choice
-        options: [macos-arm64, windows-x64, linux-x64, linux-arm64]
+        options: [macos-arm64, macos-x64, windows-x64, linux-x64, linux-arm64]
       publish:
         description: Publish the package as a release asset
         type: boolean
@@ -50,7 +50,7 @@ jobs:
   build:
     name: build ${{ inputs.package }} ${{ inputs.version }} ${{ inputs.platform }}
     # Linux: the oldest Ubuntu LTS Flock supports, so the build runs on every newer distribution.
-    runs-on: ${{ fromJSON('{"windows-x64":"windows-2022","macos-arm64":"macos-15","linux-x64":"ubuntu-24.04","linux-arm64":"ubuntu-24.04-arm"}')[inputs.platform] }}
+    runs-on: ${{ fromJSON('{"windows-x64":"windows-2022","macos-arm64":"macos-15","macos-x64":"macos-15-intel","linux-x64":"ubuntu-24.04","linux-arm64":"ubuntu-24.04-arm"}')[inputs.platform] }}
     timeout-minutes: 180
     outputs:
       asset: ${{ steps.config.outputs.asset }}
@@ -76,7 +76,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ inputs.package }}-work/openssl
-          key: openssl-${{ env.OPENSSL_VERSION }}-macos-arm64-${{ env.MIN_OS }}
+          key: openssl-${{ env.OPENSSL_VERSION }}-${{ inputs.platform }}-${{ env.MIN_OS }}
 
       - name: Build
         if: runner.os == 'macOS'
@@ -179,7 +179,7 @@ jobs:
   test:
     name: run ${{ inputs.package }} ${{ inputs.version }} ${{ inputs.platform }}
     needs: build
-    runs-on: ${{ fromJSON('{"windows-x64":"windows-2022","macos-arm64":"macos-14","linux-x64":"ubuntu-24.04","linux-arm64":"ubuntu-24.04-arm"}')[inputs.platform] }}
+    runs-on: ${{ fromJSON('{"windows-x64":"windows-2022","macos-arm64":"macos-14","macos-x64":"macos-15-intel","linux-x64":"ubuntu-24.04","linux-arm64":"ubuntu-24.04-arm"}')[inputs.platform] }}
     timeout-minutes: 20
     env:
       ASSET: ${{ needs.build.outputs.asset }}
@@ -190,7 +190,15 @@ jobs:
           name: ${{ env.ASSET }}
       - name: Hide Homebrew
         if: runner.os == 'macOS'
-        run: sudo mv /opt/homebrew /opt/homebrew.hidden
+        # Apple Silicon keeps Homebrew in /opt/homebrew, Intel in /usr/local.
+        run: |
+          if [[ -d /opt/homebrew ]]; then
+            sudo mv /opt/homebrew /opt/homebrew.hidden
+          else
+            for d in Homebrew Cellar opt; do
+              [[ -e /usr/local/$d ]] && sudo mv /usr/local/$d /usr/local/$d.hidden
+            done
+          fi
       - name: Smoke test
         if: runner.os != 'Windows'
         run: bash scripts/smoke-service.sh "$PKG" "$ASSET"

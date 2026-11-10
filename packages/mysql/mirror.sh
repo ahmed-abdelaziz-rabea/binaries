@@ -11,6 +11,7 @@ V="$1"; PLATFORM="$2"; OUT="$3"
 case "$PLATFORM" in
   # Oracle names macOS builds after the oldest macOS they support, which moves over time.
   macos-arm64) names=("mysql-$V-macos15-arm64.tar.gz" "mysql-$V-macos14-arm64.tar.gz" "mysql-$V-macos26-arm64.tar.gz") ;;
+  macos-x64) names=("mysql-$V-macos15-x86_64.tar.gz" "mysql-$V-macos14-x86_64.tar.gz" "mysql-$V-macos26-x86_64.tar.gz") ;;
   windows-x64) names=("mysql-$V-winx64.zip") ;;
   linux-x64) names=("mysql-$V-linux-glibc2.28-x86_64.tar.xz") ;;
   linux-arm64) names=("mysql-$V-linux-glibc2.28-aarch64.tar.xz") ;;

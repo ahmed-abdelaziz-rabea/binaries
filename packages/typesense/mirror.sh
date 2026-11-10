@@ -9,6 +9,7 @@ V="$1"; PLATFORM="$2"; OUT="$3"
 
 case "$PLATFORM" in
   macos-arm64) target=darwin-arm64 ;;
+  macos-x64) target=darwin-amd64 ;;
   linux-x64) target=linux-amd64 ;;
   linux-arm64) target=linux-arm64 ;;
   *) echo "Typesense has no Windows build" >&2; exit 1 ;;

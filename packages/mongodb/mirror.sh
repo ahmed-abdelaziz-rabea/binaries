@@ -8,6 +8,7 @@ V="$1"; PLATFORM="$2"; OUT="$3"
 
 case "$PLATFORM" in
   macos-arm64) urls=("https://fastdl.mongodb.org/osx/mongodb-macos-arm64-$V.tgz") ;;
+  macos-x64) urls=("https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-$V.tgz") ;;
   windows-x64) urls=("https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-$V.zip") ;;
   linux-x64 | linux-arm64)
     arch=x86_64; [[ "$PLATFORM" == linux-arm64 ]] && arch=aarch64

@@ -9,6 +9,7 @@ V="$1"; PLATFORM="$2"; OUT="$3"
 
 case "$PLATFORM" in
   macos-arm64) name="node-v$V-darwin-arm64.tar.gz" ;;
+  macos-x64) name="node-v$V-darwin-x64.tar.gz" ;;
   windows-x64) name="node-v$V-win-x64.zip" ;;
   linux-x64) name="node-v$V-linux-x64.tar.gz" ;;
   linux-arm64) name="node-v$V-linux-arm64.tar.gz" ;;

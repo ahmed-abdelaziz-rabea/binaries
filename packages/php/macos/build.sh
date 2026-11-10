@@ -25,6 +25,12 @@ OUT="$(mkdir -p "${2:?usage: build.sh <major.minor[.patch]> <out-dir>}" && cd "$
 SHARED_EXTS="${SHARED_EXTS:-}"
 TARGET="${TARGET:-php}"
 export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-13.0}"
+# Built for the machine it runs on: Apple silicon (arm64) or Intel (x86_64).
+case "$(uname -m)" in
+  arm64)  clang_arch=arm64;  spc_arch=aarch64 ;;
+  x86_64) clang_arch=x86_64; spc_arch=x86_64 ;;
+  *)      echo "unsupported architecture $(uname -m)" >&2; exit 1 ;;
+esac
 
 case "$TARGET" in
   php)        build_flags=(--build-cli --build-fpm); binaries=(php php-fpm) ;;
@@ -39,7 +45,7 @@ cd "$WORK_DIR"
 # clang rejects now that it defaults to C23. Only PHP's own C flags get -std=gnu17: the
 # default flags also reach C++ compilers, which refuse it. (macOS builds start at 8.1.)
 if [[ "$PHP_MINOR" == 8.1 ]]; then
-  export SPC_CMD_VAR_PHP_MAKE_EXTRA_CFLAGS="-g -fstack-protector-strong -fpic -fpie -Werror=unknown-warning-option --target=arm64-apple-darwin -Os -std=gnu17"
+  export SPC_CMD_VAR_PHP_MAKE_EXTRA_CFLAGS="-g -fstack-protector-strong -fpic -fpie -Werror=unknown-warning-option --target=$clang_arch-apple-darwin -Os -std=gnu17"
 fi
 
 # Stable Xdebug: static-php-cli takes the newest tag, which can be an alpha (3.6.0alpha1
@@ -53,7 +59,7 @@ DOWNLOAD_ARGS="$DOWNLOAD_ARGS --custom-url=opentelemetry:https://pecl.php.net/ge
 
 echo "::group::static-php-cli $SPC_VERSION"
 if [[ ! -x ./spc ]]; then
-  curl -fsSL "https://github.com/crazywhalecc/static-php-cli/releases/download/$SPC_VERSION/spc-macos-aarch64.tar.gz" | tar xz
+  curl -fsSL "https://github.com/crazywhalecc/static-php-cli/releases/download/$SPC_VERSION/spc-macos-$spc_arch.tar.gz" | tar xz
   chmod +x spc
 fi
 ./spc --version

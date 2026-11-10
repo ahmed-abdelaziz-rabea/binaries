@@ -126,12 +126,15 @@ func (v *versions) configOf(pkg string) (name string, p pkgConfig, ok bool) {
 }
 
 // platforms are the platforms packages are published for, in the order they are planned.
-var platforms = []string{"macos-arm64", "windows-x64", "linux-x64", "linux-arm64"}
+var platforms = []string{"macos-arm64", "macos-x64", "windows-x64", "linux-x64", "linux-arm64"}
+
+// macOSPlatforms are the platforms PHP and FrankenPHP are built for on macOS: Apple silicon and Intel.
+var macOSPlatforms = []string{"macos-arm64", "macos-x64"}
 
 // linuxPlatforms are the platforms PHP and FrankenPHP are built for on Linux.
 var linuxPlatforms = []string{"linux-x64", "linux-arm64"}
 
-var platformExt = map[string]string{"macos-arm64": "tar.gz", "windows-x64": "zip", "linux-x64": "tar.gz", "linux-arm64": "tar.gz"}
+var platformExt = map[string]string{"macos-arm64": "tar.gz", "macos-x64": "tar.gz", "windows-x64": "zip", "linux-x64": "tar.gz", "linux-arm64": "tar.gz"}
 
 func loadVersions(path string) (*versions, error) {
 	data, err := os.ReadFile(path)

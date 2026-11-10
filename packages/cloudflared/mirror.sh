@@ -9,6 +9,7 @@ V="$1"; PLATFORM="$2"; OUT="$3"
 
 case "$PLATFORM" in
   macos-arm64) asset="cloudflared-darwin-arm64.tgz" ;;
+  macos-x64) asset="cloudflared-darwin-amd64.tgz" ;;
   windows-x64) asset="cloudflared-windows-amd64.exe" ;;
   linux-x64) asset="cloudflared-linux-amd64" ;;
   linux-arm64) asset="cloudflared-linux-arm64" ;;
