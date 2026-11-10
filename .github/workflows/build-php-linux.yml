@@ -98,6 +98,7 @@ jobs:
         run: bash packages/php/linux/build.sh "$VERSION" out
 
       - name: Portability (readelf)
+        shell: bash
         run: bash scripts/verify-linux.sh out | tee -a "$GITHUB_STEP_SUMMARY"
 
       # Every shared extension in versions.json has to build and load for a release.
@@ -105,6 +106,7 @@ jobs:
         run: bash scripts/smoke-php-package.sh "$PKG" out
 
       - name: Package
+        shell: bash
         run: |
           jq -n --arg package "$PKG" --arg version "$VERSION" --argjson build "$BUILD" --arg platform "$PLATFORM" \
                 --arg commit "$GITHUB_SHA" --arg spc "$SPC_VERSION" --arg static "$STATIC_EXTS" --arg shared "$SHARED_EXTS" \

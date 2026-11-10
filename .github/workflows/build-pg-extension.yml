@@ -83,6 +83,7 @@ jobs:
         run: MACOSX_DEPLOYMENT_TARGET="$MIN_OS" bash "packages/$EXT/build.sh" "$VERSION" pg out
       - name: Portability (otool)
         if: runner.os == 'macOS'
+        shell: bash
         run: bash scripts/verify-macos.sh out "$MIN_OS" | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Build tools
@@ -93,6 +94,7 @@ jobs:
         run: bash "packages/$EXT/build.sh" "$VERSION" pg out
       - name: Portability (readelf)
         if: runner.os == 'Linux'
+        shell: bash
         run: bash scripts/verify-linux.sh out | tee -a "$GITHUB_STEP_SUMMARY"
 
       - uses: ilammy/msvc-dev-cmd@v1

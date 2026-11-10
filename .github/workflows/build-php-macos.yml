@@ -97,6 +97,7 @@ jobs:
         run: MACOSX_DEPLOYMENT_TARGET="$MIN_OS" bash packages/php/macos/build.sh "$VERSION" out
 
       - name: Portability (otool)
+        shell: bash
         run: bash scripts/verify-macos.sh out "$MIN_OS" | tee -a "$GITHUB_STEP_SUMMARY"
 
       # Every shared extension in versions.json has to build and load for a release.
@@ -104,6 +105,7 @@ jobs:
         run: bash scripts/smoke-php-package.sh "$PKG" out
 
       - name: Package
+        shell: bash
         run: |
           jq -n --arg package "$PKG" --arg version "$VERSION" --argjson build "$BUILD" --arg commit "$GITHUB_SHA" \
                 --arg spc "$SPC_VERSION" --arg min_os "$MIN_OS" --arg static "$STATIC_EXTS" --arg shared "$SHARED_EXTS" \
@@ -152,7 +154,7 @@ jobs:
             sudo mv /opt/homebrew /opt/homebrew.hidden
           else
             for d in Homebrew Cellar opt; do
-              [[ -e /usr/local/$d ]] && sudo mv /usr/local/$d /usr/local/$d.hidden
+              if [[ -e /usr/local/$d ]]; then sudo mv /usr/local/$d /usr/local/$d.hidden; fi
             done
           fi
       - name: Smoke test

@@ -75,6 +75,7 @@ jobs:
       - name: Download and verify
         env:
           ASSET: ${{ steps.config.outputs.asset }}
+        shell: bash
         run: |
           bash "packages/$PKG/mirror.sh" "$VERSION" "$PLATFORM" "$ASSET" | tee -a "$GITHUB_STEP_SUMMARY"
           echo "$(sha256sum "$ASSET")  ($(du -h "$ASSET" | cut -f1))" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -111,11 +112,12 @@ jobs:
             sudo mv /opt/homebrew /opt/homebrew.hidden
           else
             for d in Homebrew Cellar opt; do
-              [[ -e /usr/local/$d ]] && sudo mv /usr/local/$d /usr/local/$d.hidden
+              if [[ -e /usr/local/$d ]]; then sudo mv /usr/local/$d /usr/local/$d.hidden; fi
             done
           fi
       - name: Portability
         if: runner.os == 'Linux'
+        shell: bash
         run: |
           mkdir pkg && tar -C pkg -xzf "$ASSET"
           bash scripts/verify-linux.sh pkg | tee -a "$GITHUB_STEP_SUMMARY"
