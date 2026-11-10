@@ -1,3 +1,13 @@
+<div dir="rtl">
+
+> **الريبو ده نسخة من [flock-php/binaries](https://github.com/flock-php/binaries)، بتبني برامج [Flock Intel](https://github.com/ahmed-abdelaziz-rabea/flock) لماكات Intel (`macos-x64`) بس.**
+> البناء بيشتغل لوحده كل يوم على أجهزة ماك Intel عند GitHub، وبيتنشر هنا في الـ Releases بملف manifest موقّع بمفتاحنا. أما باقي الأنظمة، فبيبنيها الريبو الأصلي.
+> الإعداد: الـ variable اسمه `PLATFORMS=macos-x64`، والـ secret اسمه `MANIFEST_SIGNING_KEY` في الـ environment اللي اسمه `release`.
+>
+> *A fork of flock-php/binaries that builds packages for Intel Macs (macos-x64) only, for Flock Intel.*
+
+</div>
+
 # Flock binaries
 
 Prebuilt PHP, FrankenPHP and services (PostgreSQL, MariaDB, MySQL, MongoDB, Valkey, Redis,
