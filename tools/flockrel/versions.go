@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -98,6 +99,9 @@ type platformConfig struct {
 	// Upstream names a version lookup of this platform's own (upstreamFuncs), per PostgreSQL
 	// major, where it is built from another release than the source's (OSGeo's Windows bundles).
 	Upstream string `json:"upstream"`
+	// Lines limits this platform to some of the package's lines, where upstream publishes no
+	// build of the others for it (MySQL 8.4 on Intel Macs).
+	Lines []string `json:"lines"`
 }
 
 // majors are the PostgreSQL majors an extension is built for on a platform.
@@ -168,6 +172,11 @@ func (v *versions) check() error {
 			}
 			if c.Build < 1 {
 				return fmt.Errorf("versions.json: %s %s: build must be >= 1", name, platform)
+			}
+			for _, l := range c.Lines {
+				if !slices.Contains(p.Lines, l) {
+					return fmt.Errorf("versions.json: %s %s: line %q isn't one of the package's lines", name, platform, l)
+				}
 			}
 			if c.Upstream != "" && upstreamFuncs[c.Upstream] == nil {
 				return fmt.Errorf("versions.json: %s %s: unknown upstream %q", name, platform, c.Upstream)

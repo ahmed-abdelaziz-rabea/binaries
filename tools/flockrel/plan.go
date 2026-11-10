@@ -218,6 +218,9 @@ func runPlan(args []string) error {
 				if !ok || c.Upstream != "" {
 					continue
 				}
+				if len(c.Lines) > 0 && !slices.ContainsFunc(c.Lines, func(l string) bool { return inLine(ver, l) }) {
+					continue
+				}
 				// An extension: one package per PostgreSQL major, built after postgres (release.yml).
 				if majors := p.majors(platform); len(majors) > 0 {
 					for _, major := range majors {
